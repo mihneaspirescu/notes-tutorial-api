@@ -1,0 +1,19 @@
+{
+  "name": "01_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.80.0",
+    "ip": "^1.1.5",
+    "request": "^2.81.0",
+    "request-ip": "^2.0.2",
+    "request-promise-native": "^1.0.4",
+    "shortid": "^2.2.8"
+  }
+}
