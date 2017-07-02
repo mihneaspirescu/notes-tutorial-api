@@ -15,8 +15,31 @@ AWS.config.update({
     endpoint: "https://dynamodb.eu-west-1.amazonaws.com"
 });
 
-
 let docClient = new AWS.DynamoDB.DocumentClient({region: 'eu-west-1'});
+
+//////////////////////////////////////////////////////////////////////
+let instance = {};
+getInstaceData().then( instanceDetails => {
+    instance = {
+        availabilityZone: instanceDetails.availabilityZone,
+        privateIp: instanceDetails.privateIp,
+        instanceId: instanceDetails.instanceId,
+        region: instanceDetails.region
+    };
+
+    //start the server
+    app.listen(app.get('port'), function () {
+        console.log('Express server listening on port ' + app.get('port'))
+    });
+
+}).catch( err => {
+    console.log("[ERROR] Could not retrieve instance information");
+
+    app.listen(app.get('port'), function () {
+        console.log('Express server listening on port ' + app.get('port'))
+    });
+});
+//////////////////////////////////////////////////////////////////////
 
 
 // all environments
@@ -51,6 +74,7 @@ app.get('/location', (req, res) => {
             reason  : "private-addr",
             ip      : ipAddr,
             location: "private address",
+            instance,
         });
         return;
     }
@@ -63,7 +87,8 @@ app.get('/location', (req, res) => {
             ip          : ipAddr,
             location    : location.country,
             country_code: location.countryCode,
-            flag_url    : `http://www.geognos.com/api/en/countries/flag/${location.countryCode}.png`
+            flag_url    : `http://www.geognos.com/api/en/countries/flag/${location.countryCode}.png`,
+            instance
         });
 
 
@@ -110,7 +135,7 @@ app.post('/note', (req, res) => {
 
 
     insertNoteInDynamoDB(note).then(() => {
-        res.json({success: true, note});
+        res.json({success: true, note,instance});
     });
 
 
@@ -123,9 +148,9 @@ app.get('/note', (req, res) => {
 
     let country_code = req.query.country_code;
     getAllNotesFromDynamoDb(country_code).then(data => {
-        res.json({success: true, data: data.Items, length: data.Items.length})
+        res.json({success: true, data: data.Items, length: data.Items.length,instance})
     }).catch(err => {
-        res.json({success: false, reason: "Something went wrong"})
+        res.json({success: false, reason: "Something went wrong",instance})
     });
 
 });
@@ -138,13 +163,13 @@ app.get('/note/:id', (req, res) => {
 
 
     getNoteWithIDFromDynamoDB(id).then(data => {
-        res.json({success: true, note:data.Items[0]})
+        res.json({success: true, note:data.Items[0],instance})
     })
 
 });
-app.listen(app.get('port'), function () {
-    console.log('Express server listening on port ' + app.get('port'))
-});
+// app.listen(app.get('port'), function () {
+//     console.log('Express server listening on port ' + app.get('port'))
+// });
 
 //////////////////////////////////////////////////////////////////////
 ///////////////////// Dynamodb helpers
@@ -242,5 +267,15 @@ function getLocation(ip) {
     };
     return rp(options)
 }
+
+function getInstaceData() {
+    const options = {
+        uri : `http://169.254.169.254/latest/dynamic/instance-identity/document`,
+        json: true // Automatically parses the JSON string in the response
+    };
+    return rp(options)
+}
+
+
 
 
