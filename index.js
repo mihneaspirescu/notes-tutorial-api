@@ -85,9 +85,9 @@ app.get('/location', (req, res) => {
         res.json({
             success     : true,
             ip          : ipAddr,
-            location    : location.country,
-            country_code: location.countryCode,
-            flag_url    : `http://www.geognos.com/api/en/countries/flag/${location.countryCode}.png`,
+            location    : location.country_name,
+            country_code: location.country_code,
+            flag_url    : `http://www.geognos.com/api/en/countries/flag/${location.country_code}.png`,
             instance
         });
 
@@ -262,7 +262,7 @@ const getAllNotesFromDynamoDb = (country_code) => {
 
 function getLocation(ip) {
     const options = {
-        uri : `http://ip-api.com/json/${ip}`,
+        uri : `http://freegeoip.net/json/${ip}`,
         json: true // Automatically parses the JSON string in the response
     };
     return rp(options)

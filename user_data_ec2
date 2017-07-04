@@ -1,0 +1,13 @@
+#!/bin/bash
+curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
+yum -y install nodejs
+yum -y install git
+mkdir /api
+git clone https://github.com/mihneaspirescu/notes-tutorial-api.git /api
+export PORT=80
+cd /api
+npm install pm2 -g
+npm install
+pm2 startup
+pm2 start app.config.js --env production
+pm2 save
