@@ -3,13 +3,11 @@
  */
 const rp  = require('request-promise-native');
 const AWS = require("aws-sdk");
-const ec2 = new AWS.EC2();
-
 AWS.config.update({
     region  : "eu-west-1",
-    endpoint: "https://dynamodb.eu-west-1.amazonaws.com"
 });
 
+const ec2 = new AWS.EC2();
 
 function getInstanceData() {
     const options = {
@@ -30,6 +28,7 @@ getInstanceData().then(instanceDetails => {
         region          : instanceDetails.region
     };
 
+
     return {
         Filters: [
             {
@@ -42,7 +41,7 @@ getInstanceData().then(instanceDetails => {
     };
 }).then( params => {
     return ec2.describeTags(params).promise()
-}).then((err, data) => {
+}).then((data) => {
     console.log(data);
 }).catch(err => {
     console.log(err, err.stack);
