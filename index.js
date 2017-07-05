@@ -18,23 +18,14 @@ winston.configure({
     ]
 });
 
-AWS.config.update({
-    region  : "eu-west-1",
-    endpoint: "https://dynamodb.eu-west-1.amazonaws.com"
-});
-
-
-let docClient = new AWS.DynamoDB.DocumentClient({region: 'eu-west-1'});
-
-
-// all environments
-app.set('port', process.env.PORT || 3000);
-app.set('env', process.env.APP_ENV || "dev" );
-
 
 //////////////////////////////////////////////////////////////////////
 // Configuration based on AWS instance metadata
 //////////////////////////////////////////////////////////////////////
+// all environments
+app.set('port', process.env.PORT || 3000);
+app.set('env', process.env.APP_ENV || "dev" );
+
 // import the helper and use it to get instance data
 // and an object with all the tags
 let instance = {};
@@ -45,14 +36,16 @@ console.log("the environment is :", app.get('env'));
 if (app.get('env') === "prod") {
 
 
-    awsHelper.loadInfo().then(res => {
-        winston.info("Received data about the instance... " + res["instanceDetails"].instanceId);
+    awsHelper.loadInfo().then(details => {
+        console.log(details);
+        winston.info("Received data about the instance... " + details["instanceDetails"].instanceId);
 
         //configure the instance variable that will be used in
         //attaching the data to http handlers.
-        instance = res["instanceDetails"];
-        DB_TABLE_NAME = res.tags.table;
-        winston.info("The table name is now set to - ", res.tags.table);
+        instance = details["instanceDetails"];
+        DB_TABLE_NAME = details.tags.table;
+
+        winston.info("The table name is now set to - ", details.tags.table);
 
         //start http server
         app.listen(app.get('port'), function () {
@@ -69,6 +62,16 @@ if (app.get('env') === "prod") {
     });
 }
 //////////////////////////////////////////////////////////////////////
+
+
+AWS.config.update({
+    region  : "eu-west-1",
+    endpoint: "https://dynamodb.eu-west-1.amazonaws.com"
+});
+
+
+let docClient = new AWS.DynamoDB.DocumentClient({region: 'eu-west-1'});
+
 
 
 //enable json parsing
