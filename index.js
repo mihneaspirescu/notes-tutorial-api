@@ -38,9 +38,10 @@ app.set('port', process.env.PORT || 3000);
 // and an object with all the tags
 let instance = {};
 let DB_TABLE_NAME = "";
+const awsHelper = require('./awsHelper');
 if (process.env.NODE_ENV === "production") {
 
-    const awsHelper = require('./awsHelper');
+
     awsHelper.loadInfo().then(res => {
         winston.info("Received data about the instance... " + res["instanceDetails"].instanceId);
 
