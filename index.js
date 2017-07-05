@@ -65,8 +65,8 @@ if (app.get('env') === "prod") {
 
 
 AWS.config.update({
-    region  : "eu-west-1",
-    endpoint: "https://dynamodb.eu-west-1.amazonaws.com"
+    region: instance.region,
+    endpoint: `https://dynamodb.${instance.region}.amazonaws.com`
 });
 
 
