@@ -9,34 +9,50 @@ const rp         = require('request-promise-native');
 const ip         = require('ip');
 const shortid    = require('shortid');
 const AWS        = require("aws-sdk");
+const winston    = require("winston");
+
+winston.configure({
+    transports: [
+        new (winston.transports.File)({filename: 'api.log'})
+    ]
+});
 
 AWS.config.update({
     region  : "eu-west-1",
     endpoint: "https://dynamodb.eu-west-1.amazonaws.com"
 });
 
+
+const ec2 = new AWS.EC2();
+
+
+
 let docClient = new AWS.DynamoDB.DocumentClient({region: 'eu-west-1'});
 
 //////////////////////////////////////////////////////////////////////
 let instance = {};
-getInstaceData().then( instanceDetails => {
+getInstaceData().then(instanceDetails => {
     instance = {
         availabilityZone: instanceDetails.availabilityZone,
-        privateIp: instanceDetails.privateIp,
-        instanceId: instanceDetails.instanceId,
-        region: instanceDetails.region
+        privateIp       : instanceDetails.privateIp,
+        instanceId      : instanceDetails.instanceId,
+        region          : instanceDetails.region
     };
 
+
+
+
     //start the server
+    winston.info('Successfully got instance data for ' + instanceDetails.instanceId);
     app.listen(app.get('port'), function () {
-        console.log('Express server listening on port ' + app.get('port'))
+        winston.info('Express server listening on port ' + app.get('port'))
     });
 
-}).catch( err => {
-    console.log("[ERROR] Could not retrieve instance information");
-
+}).catch(err => {
+    winston.error('Could not retrieve instance data');
     app.listen(app.get('port'), function () {
-        console.log('Express server listening on port ' + app.get('port'))
+
+        winston.info('Express server listening on port ' + app.get('port'))
     });
 });
 //////////////////////////////////////////////////////////////////////
@@ -49,6 +65,7 @@ app.set('port', process.env.PORT || 3000);
 app.use(bodyParser.json());
 app.use(function (error, req, res, next) {
     if (error instanceof SyntaxError) {
+        winston.error('Malformed json received');
         res.json({success: false, reason: "marformed json"});
     } else {
         next();
@@ -66,9 +83,10 @@ app.use(requestIp.mw());
 app.get('/location', (req, res) => {
 
     const ipAddr = req.clientIp;
-
+    winston.info({endpoint:'/location', action:"hit", method:"GET"});
 
     if (ip.isPrivate(ipAddr)) {
+        winston.warn({error:'Private CIDR block received', endpoint:"/location"});
         res.json({
             success : false,
             reason  : "private-addr",
@@ -94,6 +112,7 @@ app.get('/location', (req, res) => {
 
     }).catch(function (err) {
         // API call failed...
+        winston.error({endpoint:'/location', error:err});
         res.json({error: err})
     });
 
@@ -101,11 +120,8 @@ app.get('/location', (req, res) => {
 });
 
 
-
-
-
 app.post('/note', (req, res) => {
-
+    winston.info({endpoint:'/note', action:"hit", method:"POST"});
 
     const postInfo = req.body;
 
@@ -135,7 +151,7 @@ app.post('/note', (req, res) => {
 
 
     insertNoteInDynamoDB(note).then(() => {
-        res.json({success: true, note,instance});
+        res.json({success: true, note, instance});
     });
 
 
@@ -145,12 +161,13 @@ app.post('/note', (req, res) => {
 // gets all notes
 // will be limited to the last 20
 app.get('/note', (req, res) => {
+    winston.info({endpoint:'/note', action:"hit", method:"GET"});
 
     let country_code = req.query.country_code;
     getAllNotesFromDynamoDb(country_code).then(data => {
-        res.json({success: true, data: data.Items, length: data.Items.length,instance})
+        res.json({success: true, data: data.Items, length: data.Items.length, instance})
     }).catch(err => {
-        res.json({success: false, reason: "Something went wrong",instance})
+        res.json({success: false, reason: "Something went wrong", instance})
     });
 
 });
@@ -158,12 +175,11 @@ app.get('/note', (req, res) => {
 
 app.get('/note/:id', (req, res) => {
 
-    const id   = req.params.id;
-
-
+    const id = req.params.id;
+    winston.info({endpoint:`/note/${id}`, action:"hit", method:"GET"});
 
     getNoteWithIDFromDynamoDB(id).then(data => {
-        res.json({success: true, note:data.Items[0],instance})
+        res.json({success: true, note: data.Items[0], instance})
     })
 
 });
@@ -267,15 +283,4 @@ function getLocation(ip) {
     };
     return rp(options)
 }
-
-function getInstaceData() {
-    const options = {
-        uri : `http://169.254.169.254/latest/dynamic/instance-identity/document`,
-        json: true // Automatically parses the JSON string in the response
-    };
-    return rp(options)
-}
-
-
-
 
