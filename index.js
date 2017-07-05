@@ -47,6 +47,13 @@ if (app.get('env') === "prod") {
 
         console.log("The table name is now set to - ", DB_TABLE_NAME);
 
+
+        AWS.config.update({
+            region: instance.region,
+            endpoint: `https://dynamodb.${instance.region}.amazonaws.com`
+        });
+
+
         //start http server
         app.listen(app.get('port'), function () {
             winston.info('Express server listening on port ' + app.get('port'))
@@ -64,10 +71,6 @@ if (app.get('env') === "prod") {
 //////////////////////////////////////////////////////////////////////
 
 
-AWS.config.update({
-    region: instance.region,
-    endpoint: `https://dynamodb.${instance.region}.amazonaws.com`
-});
 
 
 let docClient = new AWS.DynamoDB.DocumentClient({region: 'eu-west-1'});
