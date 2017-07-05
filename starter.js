@@ -5,6 +5,12 @@ const rp  = require('request-promise-native');
 const AWS = require("aws-sdk");
 const ec2 = new AWS.EC2();
 
+AWS.config.update({
+    region  : "eu-west-1",
+    endpoint: "https://dynamodb.eu-west-1.amazonaws.com"
+});
+
+
 function getInstanceData() {
     const options = {
         uri : `http://169.254.169.254/latest/dynamic/instance-identity/document`,
