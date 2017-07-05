@@ -29,6 +29,7 @@ let docClient = new AWS.DynamoDB.DocumentClient({region: 'eu-west-1'});
 
 // all environments
 app.set('port', process.env.PORT || 3000);
+app.set('env', process.env.APP_ENV || "dev" );
 
 
 //////////////////////////////////////////////////////////////////////
@@ -39,7 +40,9 @@ app.set('port', process.env.PORT || 3000);
 let instance = {};
 let DB_TABLE_NAME = "";
 const awsHelper = require('./awsHelper');
-if (process.env.NODE_ENV === "production") {
+
+
+if (app.get('env') === "prod") {
 
 
     awsHelper.loadInfo().then(res => {
