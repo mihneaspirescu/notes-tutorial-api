@@ -5,7 +5,7 @@ module.exports = {
     apps: [{
         name          : "api",
         script        : "./index.js",
-        watch         : true,
+        watch         : false,
         env           : {
             "NODE_ENV": "development",
             "APP_ENV" : "dev"
