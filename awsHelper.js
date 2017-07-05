@@ -3,11 +3,8 @@
  */
 const rp  = require('request-promise-native');
 const AWS = require("aws-sdk");
-AWS.config.update({
-    region: "eu-west-1",
-});
 
-const ec2 = new AWS.EC2();
+
 
 function getInstanceData() {
     const options = {
@@ -28,6 +25,10 @@ exports.loadInfo = () => getInstanceData().then(instanceDetails => {
         region          : instanceDetails.region
     };
 
+    AWS.config.update({
+        region: instanceDetails.region,
+    });
+
 
     return {
         Filters: [
@@ -41,6 +42,7 @@ exports.loadInfo = () => getInstanceData().then(instanceDetails => {
     };
 }).then(params => {
     // get the tags of the current running instance
+    const ec2 = new AWS.EC2();
     return ec2.describeTags(params).promise()
 }).then((data) => {
     // parse the tags and return an object with it's
