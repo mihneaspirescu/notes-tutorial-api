@@ -48,6 +48,7 @@ if (process.env.NODE_ENV === "production") {
         //attaching the data to http handlers.
         instance = res["instanceDetails"];
         DB_TABLE_NAME = res.tags.table;
+        winston.info("The table name is now set to - ", res.tags.table);
 
         //start http server
         app.listen(app.get('port'), function () {
