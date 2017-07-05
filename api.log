@@ -1,4 +1,4 @@
-{"level":"error","message":"Could not retrieve instance data","timestamp":"2017-07-04T19:02:48.757Z"}
+c{"level":"error","message":"Could not retrieve instance data","timestamp":"2017-07-04T19:02:48.757Z"}
 {"level":"info","message":"Express server listening on port 3000","timestamp":"2017-07-04T19:02:48.764Z"}
 {"level":"error","message":"Could not retrieve instance data","timestamp":"2017-07-04T19:09:51.594Z"}
 {"level":"info","message":"Express server listening on port 3000","timestamp":"2017-07-04T19:09:51.602Z"}
@@ -9,3 +9,5 @@
 {"level":"info","message":"Express server listening on port 3000","timestamp":"2017-07-04T19:15:35.035Z"}
 {"endpoint":"/location","action":"hit","method":"GET","level":"info","message":"","timestamp":"2017-07-04T19:15:38.245Z"}
 {"error":"Private CIDR block received","endpoint":"/location","level":"warn","message":"","timestamp":"2017-07-04T19:15:38.246Z"}
+{"level":"info","message":"Started server in development mode - no instance information","timestamp":"2017-07-05T15:22:15.756Z"}
+{"level":"info","message":"Express server listening on port 3000","timestamp":"2017-07-05T15:22:15.775Z"}

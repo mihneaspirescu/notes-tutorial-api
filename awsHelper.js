@@ -4,7 +4,7 @@
 const rp  = require('request-promise-native');
 const AWS = require("aws-sdk");
 AWS.config.update({
-    region  : "eu-west-1",
+    region: "eu-west-1",
 });
 
 const ec2 = new AWS.EC2();
@@ -18,10 +18,10 @@ function getInstanceData() {
 }
 
 
-let instance = {};
+let _instance = {};
 
-getInstanceData().then(instanceDetails => {
-    instance = {
+exports.loadInfo = () => getInstanceData().then(instanceDetails => {
+    _instance = {
         availabilityZone: instanceDetails.availabilityZone,
         privateIp       : instanceDetails.privateIp,
         instanceId      : instanceDetails.instanceId,
@@ -39,10 +39,20 @@ getInstanceData().then(instanceDetails => {
             }
         ]
     };
-}).then( params => {
+}).then(params => {
+    // get the tags of the current running instance
     return ec2.describeTags(params).promise()
 }).then((data) => {
-    console.log(data);
+    // parse the tags and return an object with it's
+    // tags as key-value pairs.
+    let tags = {};
+    data.Tags.forEach((tag) => {
+        tags[tag.Key] = tag.Value
+    });
+    return tags;
+}).then(tags => {
+    // aggregate the necessary information
+    return {tags, instance: _instance};
 }).catch(err => {
     console.log(err, err.stack);
 });
