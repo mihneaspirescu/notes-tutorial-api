@@ -63,6 +63,11 @@ if (app.get('env') === "prod") {
     });
 
 } else {
+    AWS.config.update({
+        region: "eu-west-1",
+        endpoint: `https://dynamodb.eu-west-1.amazonaws.com`
+    });
+
     winston.info("Started server in development mode - no instance information");
     app.listen(app.get('port'), function () {
         winston.info('Express server listening on port ' + app.get('port'))
