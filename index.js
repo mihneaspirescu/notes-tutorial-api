@@ -45,7 +45,7 @@ if (app.get('env') === "prod") {
         instance = details["instanceDetails"];
         DB_TABLE_NAME = details.tags.table;
 
-        winston.info("The table name is now set to - ", details.tags.table);
+        console.log("The table name is now set to - ", DB_TABLE_NAME);
 
         //start http server
         app.listen(app.get('port'), function () {
