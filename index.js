@@ -40,7 +40,7 @@ app.set('env', process.env.APP_ENV || "dev" );
 let instance = {};
 let DB_TABLE_NAME = "";
 const awsHelper = require('./awsHelper');
-
+console.log("the environment is :", app.get('env'));
 
 if (app.get('env') === "prod") {
 
@@ -58,6 +58,8 @@ if (app.get('env') === "prod") {
         app.listen(app.get('port'), function () {
             winston.info('Express server listening on port ' + app.get('port'))
         });
+    }).catch((err) => {
+        console.log(err);
     });
 
 } else {
