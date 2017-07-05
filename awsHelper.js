@@ -53,7 +53,7 @@ exports.loadInfo = () => getInstanceData().then(instanceDetails => {
 }).then(tags => {
     // aggregate the necessary information
 
-    return {tags, instanceDetails: _instance};
+    return {tags:tags, instanceDetails: _instance};
 }).catch(err => {
     console.log(err, err.stack);
 });

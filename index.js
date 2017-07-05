@@ -37,6 +37,7 @@ app.set('port', process.env.PORT || 3000);
 // import the helper and use it to get instance data
 // and an object with all the tags
 let instance = {};
+let DB_TABLE_NAME = "";
 if (process.env.NODE_ENV === "production") {
 
     const awsHelper = require('./awsHelper');
@@ -46,6 +47,7 @@ if (process.env.NODE_ENV === "production") {
         //configure the instance variable that will be used in
         //attaching the data to http handlers.
         instance = res["instanceDetails"];
+        DB_TABLE_NAME = res.tags.table;
 
         //start http server
         app.listen(app.get('port'), function () {
@@ -210,7 +212,7 @@ const insertNoteInDynamoDB = (note) => {
 
         const params = {
             Item     : noteInsert,
-            TableName: "Notes"
+            TableName: DB_TABLE_NAME
         };
         docClient.put(params, function (err, data) {
             if (err) {
@@ -225,7 +227,7 @@ const insertNoteInDynamoDB = (note) => {
 const getNoteWithIDFromDynamoDB = (note_id) => {
 
     let params = {
-        TableName: "Notes",
+        TableName: DB_TABLE_NAME,
     };
 
     params.IndexName                 = "note_id-index";
@@ -245,7 +247,7 @@ const getAllNotesFromDynamoDb = (country_code) => {
     return new Promise(function (resolve, reject) {
 
         let params = {
-            TableName       : "Notes",
+            TableName       : DB_TABLE_NAME,
             ScanIndexForward: false,
             Limit           : 20
         };
