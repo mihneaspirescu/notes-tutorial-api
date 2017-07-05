@@ -41,11 +41,11 @@ if (process.env.NODE_ENV === "production") {
 
     const awsHelper = require('./awsHelper');
     awsHelper.loadInfo().then(res => {
-        winston.info("Received data about the instance... " + res.instance.instanceId);
+        winston.info("Received data about the instance... " + res["instanceDetails"].instanceId);
 
         //configure the instance variable that will be used in
         //attaching the data to http handlers.
-        instance = res.instance;
+        instance = res["instanceDetails"];
 
         //start http server
         app.listen(app.get('port'), function () {
